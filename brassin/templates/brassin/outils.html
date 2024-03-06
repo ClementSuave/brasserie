@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Outils</h1>
+    <h4><a href="{% url 'brassin_consult' brassin_x.id %}">Brassin {{brassin_x.id}} - {{brassin_x.date_brassin}}</a></h4>
+  </div>
+</div>
+
+<div class="row">
+
+    <!--- CONVERSION --------------------------------------------------------------------------->
+
+    <div class="col-sm-12">
+    <div class="card h-100">
+
+	    <h4 class="card-header">Conversion</h4>
+
+		<div class="card-body">
+
+        <div class="col-sm-4">
+
+            <h5>Densité</h5>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité</span>
+                </div>
+                <input type="text" class="form-control" name="id_densite_P" id="id_densite_P" type="number" min="0" onkeyup="calc_SG(this.value, this.name)" placeholder="°P" />
+                <div class="input-group-append">
+                  <span class="input-group-text">°P</span>
+                </div>
+            </div>
+
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité</span>
+                </div>
+                <input type="text" class="form-control" name="id_densite" id="id_densite" type="number" min="0"/>
+            </div>
+            <small class="text-muted">1°P = 1 g de matière sèche soluble (sucre) pour 100 g de moût.</small>
+            <br/>
+
+        </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+<br/>
+
+<div class="row">
+
+    <!--- STARTER --------------------------------------------------------------------------->
+
+    <div class="col-sm-12">
+    <div class="card h-100">
+
+        <h4 class="card-header">Starter</h4>
+
+        <div class="card-body"><div class="row">
+
+        <!--- Quantité de levure nécessaire --------------------------------------------------------------------------->
+        <div class="col-sm-6">
+
+            <h5>Quantité de levure nécessaire</h5>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Taux d'ensemencement</span>
+                </div>
+
+                <select name="starter_ensemencement" id="starter_ensemencement" class="form-control" type="number" min="0" onchange="calc_quantite_levure_necessaire()" value="0.75">
+                    <option value="0.35">0.35 (Ale, fresh yeast only)</option>
+                    <option value="0.5">0.5 (Ale, fresh yeast only)</option>
+                    <option value="0.75" selected>0.75 (Ale)</option>
+                    <option value="1.0">1.0 (Ale, or High Gravity Ale)</option>
+                    <option value="1.25">1.25 (Ale, or High Gravity Ale)</option>
+                    <option value="1.5">1.5 (Lager)</option>
+                    <option value="1.75">1.75 (Lager)</option>
+                    <option value="2.0">2.0 (High Gravity Lager)</option>
+                </select>
+
+                <div class="input-group-append">
+                  <span class="input-group-text">million de cellules / ml / °P</span>
+                </div>
+
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Volume mout</span>
+                </div>
+                <input name="starter_volume_mout" id="starter_volume_mout" class="form-control" type="number" min="0" onkeyup="calc_quantite_levure_necessaire()" value="{{brassin_x.volume_mout}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">L</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité désirée</span>
+                </div>
+                <input name="starter_densite_desiree" id="starter_densite_desiree" class="form-control" type="number" min="0" onkeyup="calc_quantite_levure_necessaire()" value="{{recette.densite_desire|default:"1.07"}}">
+            </div>
+
+            <div id="quantite_levure_necessaire" class="alert alert-info alert-dismissible"></div>
+            <input name="q_levure_necessaire" id="q_levure_necessaire" class="form-control" type="number" hidden>
+
+            <button data-toggle="collapse" class="btn btn-default" data-target="#levure_paquet">Calcul levure disponible (paquet)</button>
+
+            <div id="levure_paquet" class="collapse">
+
+            <br/>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Nombre de paquets</span>
+                </div>
+                <input name="starter_paquets" id="starter_paquets" class="form-control" type="number" min="0" onkeyup="calc_quantite_levure_paquet()" value="1">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Date fabrication paquet</span>
+                </div>
+                <input name="starter_paquets_date" id="starter_paquets_date" class="form-control" type="date" onchange="calc_quantite_levure_paquet()">
+            </div>
+
+            <div id="quantite_levure_paquet" class="alert alert-info alert-dismissible"></div>
+
+            </div>
+
+
+        </div>
+
+        <!--- Starter --------------------------------------------------------------------------->
+        <div class="col-sm-6">
+
+            <h5>Starter</h5>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Taux d'ensemencement</span>
+                </div>
+                <input name="starter_ensemencement_obtenu" id="starter_ensemencement_obtenu" class="form-control" type="number" min="0" disabled>
+                <div class="input-group-append">
+                  <span class="input-group-text">million de cellules / ml / °P</span>
+                </div>
+            </div>
+
+            <small class="text-muted">1 paquet = 100 millards.</small>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Quantité de cellules viables départ</span>
+                </div>
+                <input name="starter_cel_viable_i" id="starter_cel_viable_i" class="form-control" type="number" min="0" onkeyup="calc_quantite_levure_obtenue()" value="100">
+                <div class="input-group-append">
+                  <span class="input-group-text">milliards</span>
+                </div>
+            </div>
+
+        	<div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Volume</span>
+                </div>
+                <input name="starter_volume" id="starter_volume" class="form-control" type="number" min="0" onkeyup="calc_quantite_levure_obtenue()"/>
+                <div class="input-group-append">
+                  <span class="input-group-text">L</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité</span>
+                </div>
+                <input type="text" class="form-control" name="starter_densite" id="starter_densite" type="number" min="0" onkeyup="calc_quantite_levure_obtenue()" value="9" placeholder="°P"/>
+                <div class="input-group-append">
+                  <span class="input-group-text">°P</span>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-default" onclick="calc_quantite_levure_obtenue()">Valider</button>
+            <br/><br/>
+
+            <div id="quantite_levure_obtenue" class="alert alert-dismissible"></div>
+
+            <br/>
+        </div>
+
+        </div></div>
+    </div>
+    </div>
+
+</div>
+
+<br/>
+
+<div class="row">
+
+    <!--- CALCULS --------------------------------------------------------------------------->
+
+    <div class="col-sm-12">
+    <div class="card h-100">
+
+        <h4 class="card-header">Calcul</h4>
+
+        <div class="card-body"><div class="row">
+
+        <!--- Ajustement Mout --------------------------------------------------------------------------->
+        <div class="col-sm-6">
+
+            <h5>Ajustement du moût</h5>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité</span>
+                </div>
+                <input name="densite_mesure" id="densite_mesure" class="form-control" type="number" min="0" value="{{brassin_x.densite_initiale}}">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Densité désirée</span>
+                </div>
+                <input name="densite_desiree" id="densite_desiree" class="form-control" type="number" min="0" value="{{recette.densite_desire|default:"1.07"}}">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Volume mout</span>
+                </div>
+                <input name="volume_mout" id="volume_mout" class="form-control" type="number" min="0" value="{{brassin_x.volume_mout}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">L</span>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-default" onclick="calc_ajustement_mout()">Calculer</button>
+            <br/><br/>
+
+            <div id="ajustement_mout" class="alert alert-success alert-dismissible"></div>
+            <br/>
+        </div>
+
+        <!--- Resucrage --------------------------------------------------------------------------->
+        <div class="col-sm-6">
+
+            <h5>Resucrage</h5>
+
+        	<div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Mesure</span>
+                </div>
+                <input name="mesure_hauteur_cuve" id="mesure_hauteur_cuve" class="form-control" type="number" min="0" onkeyup="calc_sucre()">
+                <div class="input-group-append">
+                  <span class="input-group-text">cm</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Resucrage</span>
+                </div>
+                <input name="taux_resucrage" id="taux_resucrage" class="form-control" type="number" min="0" value="7" onkeyup="calc_sucre()">
+                <div class="input-group-append">
+                  <span class="input-group-text">g/L</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Diamètre cuve</span>
+                </div>
+                <select name="diametre_cuve" id="diametre_cuve" class="form-control" type="number" min="0" value="{{brassin_x.fermenteur.diametre}}" onchange="calc_sucre()">
+                    {% for f in fermenteur %}
+                    <option value="{{f.diametre}}">{{f.numero}} ({{f.diametre}} cm)</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Sucre</span>
+                </div>
+                <input name="sucre_quantite" id="sucre_quantite" class="form-control" disabled>
+                <div class="input-group-append">
+                  <span class="input-group-text">g</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Volume</span>
+                </div>
+                <input name="volume_final" id="volume_final" class="form-control" disabled>
+                <div class="input-group-append">
+                  <span class="input-group-text">L</span>
+                </div>
+            </div>
+
+            <br/>
+        </div>
+
+        </div></div>
+    </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+  <script>
+  $(document).ready(function(){
+      var today= new Date();
+      $("#starter_paquets_date").val(today);
+      $("#ajustement_mout").hide();
+      $("#quantite_levure_paquet").hide();
+      $("#quantite_levure_obtenue").hide();
+      $("#quantite_levure_necessaire").val(calc_quantite_levure_necessaire());
+
+  });
+
+  //CALCULS
+
+  function calc_sucre() {
+    var mesure_hauteur_cuve = $("#mesure_hauteur_cuve").val();
+    var taux_resucrage =$("#taux_resucrage").val();
+    var diametre_cuve =$("#diametre_cuve").val();
+    var sucre_quantite = mesure_hauteur_cuve*diametre_cuve*diametre_cuve*Math.PI/(4*1000)*taux_resucrage
+    var volume_final =  mesure_hauteur_cuve*diametre_cuve*diametre_cuve*Math.PI/(4*1000)
+    $("#sucre_quantite").val(sucre_quantite.toFixed(1))
+    $("#volume_final").val(volume_final.toFixed(1))
+  }
+
+  ////AJUSTEMENT MOUT
+  function calc_ajustement_mout() {
+    var densite_mesure = $("#densite_mesure").val();
+    var densite_desiree =$("#densite_desiree").val();
+    var volume_mout =$("#volume_mout").val();
+    $("#ajustement_mout").show();
+    if (parseFloat(densite_mesure) < parseFloat(densite_desiree)){
+        var sucre_concentration = volume_mout/0.4*(densite_desiree-densite_mesure)*1000;
+        $("#ajustement_mout").text("Ajouter " + sucre_concentration.toFixed(1) + " g de sucre.")
+    }
+    else {
+        var sucre_dilution = ((((densite_mesure-1)/(densite_desiree-1))*volume_mout)-volume_mout);
+        $("#ajustement_mout").text("Ajouter " + sucre_dilution.toFixed(1) + " L d'eau.")
+    }
+  }
+
+  //DENSITE
+  $("#id_densite").on("keyup", function() {
+    P = conversion_D_P($(this).val());
+    $("#id_densite_P").val(P.toFixed(1));
+  });
+
+  //STARTER QUANTITE NECESSAIRE
+  function calc_quantite_levure_necessaire(){
+    var densite_desiree =$("#starter_densite_desiree").val();
+    var volume_mout =$("#starter_volume_mout").val();
+    var ensemencement =$("#starter_ensemencement").val();
+
+    var quantite_necessaire = conversion_D_P(densite_desiree)*volume_mout*1000*ensemencement/1000
+    $("#quantite_levure_necessaire").text("Il faut " + quantite_necessaire.toFixed(1) + " milliards de cellules. ");
+    $("#q_levure_necessaire").val(quantite_necessaire);
+    calc_quantite_levure_obtenue();
+  }
+
+  //CALCUL LEVURE PAQUET
+  function calc_quantite_levure_paquet(){
+    var nb_paquets = $("#starter_paquets").val();
+    var date_paquets =$("#starter_paquets_date").val();
+    var today= new Date();
+
+    $("#quantite_levure_paquet").show();
+    var quantite_levure_paquet = nb_paquets*100*(1-0.007*diff_date(date_paquets,today));
+    $("#quantite_levure_paquet").text(quantite_levure_paquet.toFixed(1) + " milliards de cellules disponibles. ");
+    $("#starter_cel_viable_i").val(quantite_levure_paquet);
+  }
+
+  //LEVURE APRES STARTER http://braukaiser.com/blog/blog/2012/11/03/estimating-yeast-growth/
+  function calc_quantite_levure_obtenue(){
+      var densite_desiree =conversion_D_P($("#starter_densite_desiree").val());
+      var volume_mout =$("#starter_volume_mout").val();
+      var starter_cel_viable_i =$("#starter_cel_viable_i").val();
+      var densite =$("#starter_densite").val();
+      var volume =$("#starter_volume").val();
+      var quantite_necessaire = parseFloat($("#q_levure_necessaire").val());
+
+      var BparG = starter_cel_viable_i/(volume*(12.04*densite-6.33));
+      var quantite_matiere_solide = starter_cel_viable_i/BparG;
+
+      if (BparG < 1.4) {var growth_rate = 1.4}
+      else {
+          var growth_rate = 2.33-0.67*BparG;
+      }
+      var quantite_levure = (growth_rate+BparG)*quantite_matiere_solide;
+      pitch_rate = quantite_levure*1000/(densite_desiree*volume_mout*1000)
+
+      $("#quantite_levure_obtenue").show();
+      $("#quantite_levure_obtenue").removeClass("alert-success");
+      $("#quantite_levure_obtenue").removeClass("alert-danger");
+      var diff = quantite_levure - quantite_necessaire;
+      if (quantite_levure>quantite_necessaire){
+          $("#quantite_levure_obtenue").addClass("alert-success")
+          $("#starter_ensemencement_obtenu").css("background-color", "#D4EDDA");
+          $("#quantite_levure_obtenue").text(quantite_levure.toFixed(0) + " milliards de cellules finales." + diff.toFixed(0) + " milliards de cellules en trop.");
+      }
+      else {
+          $("#quantite_levure_obtenue").addClass("alert-danger")
+          $("#starter_ensemencement_obtenu").css("background-color", "#F8D7DA");
+          $("#quantite_levure_obtenue").text(quantite_levure.toFixed(0) + " milliards de cellules finales. Il manque " + diff.toFixed(0) + " milliards de cellules.");
+      }
+
+      $("#starter_ensemencement_obtenu").val(pitch_rate.toFixed(2));
+
+  }
+
+  </script>
+{% endblock %}

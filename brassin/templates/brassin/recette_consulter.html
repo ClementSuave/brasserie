@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      	<h1>Recette</h1>
+      	<h4>{{ recette.nom }}
+			<a class="btn btn-outline-dark btn-sm" href="{% url 'recette_update' recette.id %}"><i class="fas fa-edit"></i></a>
+			<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'recettes_list' %}"><i class="fas fa-backspace"></i></a>
+		</h4>
+    </div>
+</div>
+
+<div class="row ">
+	<div class="col-sm-3">
+		<!--- PROFIL --------------------------------------------------------------------------->
+		<div class="card h-100">
+		  <h4 class="card-header">PROFIL</h4>
+		  <div class="card-body">
+		  	<p>Densité désirée: {{recette.densite_desire}}</p>
+		  	<p>Taux d'empatage: {{recette.taux_empatage}}</p>
+		  	<p>Resucrage: {{recette.resucrage}} g/L</p>
+		  	<h4>NOTES</h4>
+		  	{{recette.notes}}
+		  </div>
+		</div>
+	</div>
+
+	<div class="col-sm-9">
+		<div class="card h-100">
+		  <h4 class="card-header">GRAPH</h4>
+		  <div class="card-body">
+		  	<div id="chart_comparaison_recette"></div>
+		  </div>
+		</div>
+	</div>
+
+</div>
+
+<br/>
+
+<div class="row ">
+
+	<!--- INGREDIENTS --------------------------------------------------------------------------->
+	<div class="col-sm-7">
+		<div class="card h-100">
+		  <h4 class="card-header">INGREDIENTS<a class="btn btn-outline-dark btn-sm float-right" href="{% url 'recette_ingredient_add' recette.id %}"><i class="fas fa-plus"></i></a></h4>
+
+		  <div class="card-body">
+
+			<table class="table table-hover table-responsive" id="table_ing_recette">
+				<thead>
+				    <tr><th>Type</th><th>Variété</th><th colspan=2 >Quantité<small class="text-muted"> *</small></th></th><th>Calcul</th><th></th><th></th><th></th></tr>
+				</thead>
+				<tbody>
+					{% for ingredient in recette_ingredient.all %}
+
+					<tr>
+						<td>{{ ingredient.ingredient.type_ingredient }}</td>
+						<td><a data-toggle="tooltip" title="{{ ingredient.ingredient.stock |floatformat:'2'}} kg">{{ ingredient.ingredient.variete }}</a></td>
+						<td> {{ ingredient.quantite|floatformat:'2'}} </td>
+						<td>{{ ingredient.ingredient.unite }}</td>
+						<td></td>
+						<td><a class="btn btn-outline-dark btn-sm" href="{% url 'recette_ingredient_update' r=recette.id pk=ingredient.id %}"><i class="fas fa-sync"></i></a></td>
+						<td><a class="btn btn-outline-danger btn-sm" href="{% url 'recette_ingredient_delete' r=recette.id pk=ingredient.id %}"><i class="fas fa-times"></i></a></td>
+						<td style="display:none;">{{ ingredient.ingredient.stock }}</td>
+					</tr>
+					{% empty %}
+				    <tr>
+				        <td colspan="7" class="text-center bg-warning">Pas encore d'ingredient.</td>
+				    </tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+			<small class="text-muted">* Malts: en % de masse de malt totale </small><br/>
+			<small class="text-muted">  Autres: en g/L </small>
+
+		  </div>
+		</div>
+	</div>
+
+	<!--- CALCULATION --------------------------------------------------------------------------->
+	<div class="col-sm-5">
+		<div class="card h-100">
+		  <h4 class="card-header">Calculs</h4>
+
+		  <div class="card-body">
+
+		    <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Volume empatage</span>
+              </div>
+              <input name="volume_empatage_desire" id="volume_empatage_desire" class="form-control">
+              <div class="input-group-append">
+                <span class="input-group-text">L</span>
+              </div>
+            </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Masse totale de malt</span>
+              </div>
+              <input name="masse_totale" id="masse_totale" class="form-control" disabled>
+              <div class="input-group-append">
+                <span class="input-group-text">kg</span>
+              </div>
+            </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Volume rinçage</span>
+              </div>
+              <input name="volume_rincage_dreches" id="volume_rincage_dreches" class="form-control" disabled>
+              <div class="input-group-append">
+                <span class="input-group-text">L</span>
+              </div>
+            </div>
+
+
+            </div>
+            <input hidden value="{{recette.taux_empatage}}" id="taux_empatage">
+
+		  </div>
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+  <script>
+
+   //CALCULS RECETTE
+  $("#volume_empatage_desire").on("keyup", function() {
+    var v_empatage = $(this).val();
+    var table=$("#table_ing_recette");
+    var rowLength = $("#table_ing_recette tr").length;
+    var taux_empatage =$("#taux_empatage").val();
+    var masse_tot = taux_empatage*v_empatage
+    var quantite_tot_malt =0
+    //pour chaque ligne du tableau ingredients
+    for (var i=1; i<rowLength; i+=1)
+    {
+      //calculer les quantités
+      var stock =parseFloat($('#table_ing_recette tr:nth-child('+i+') td:nth-child(8)').text())
+      var ing =$('#table_ing_recette tr:nth-child('+i+') td:nth-child(1)').text()
+      if (ing=="Malt"){
+        var percent = $('#table_ing_recette tr:nth-child('+i+') td:nth-child(3)').text();
+        var quantite = masse_tot*parseFloat(percent)/100 ;
+        if (quantite > 1){$('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text(quantite.toFixed(1) + " kg");}
+        else {quantite_g=quantite*1000;$('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text(quantite_g.toFixed(1) + " g");}
+      }
+      else if (ing=="Levure"){
+        $('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text("");
+      }
+      else {
+        var c = $('#table_ing_recette tr:nth-child('+i+') td:nth-child(3)').text();
+        var quantite = v_empatage*c/1000 ;
+        if (quantite > 1){$('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text(quantite.toFixed(1) + " kg");}
+        else {quantite_g=quantite*1000;$('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text(quantite_g.toFixed(1) + " g");}
+      }
+
+      //alert stock
+      if (quantite>stock){
+          $('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').css({'color':'red'});
+          $('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').text(quantite.toFixed(1) + " kg \n (restant: " + stock +" kg)");
+      }
+      else {$('#table_ing_recette tr:nth-child('+i+') td:nth-child(5)').css({'color':'black'});}
+
+    }
+    $("#volume_rincage_dreches").val(10+masse_tot)
+    $("#masse_totale").val(masse_tot)
+  });
+
+            Highcharts.chart('chart_comparaison_recette', {
+
+                title: {text: 'Comparaison densité'},
+                xAxis: {type: 'datetime', categories: [{% for entry in dataset_chart_recette %}'{{ entry.date_brassin }}'{% if not forloop.last %}, {% endif %}{% endfor %}]},
+                yAxis: {
+                    floor: 1,
+                    ceiling: 2,
+                    title: {
+                        text: 'Densité'
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+                tooltip: {
+                    shared: true,
+                    useHTML: true,
+                    headerFormat: '<small>{point.key}</small><table>',
+                    pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+                        '<td style="text-align: right"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    valueDecimals: 3
+                },
+
+                series: [
+                    {
+                        name: 'Densité initiale',
+                        data: [{% for entry in dataset_chart_recette %}{{ entry.densite_initiale }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                        color: 'green'
+                    },
+                    {
+                        name: 'Densité finale',
+                        data: [{% for entry in dataset_chart_recette %}{{ entry.densite_finale }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                        color: 'black'
+                    }
+                ]
+            });
+
+    </script>
+{% endblock %}

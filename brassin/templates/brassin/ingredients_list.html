@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Ingredients</h1>
+  </div>
+</div>
+
+<a class="btn btn-info btn-sm" href="{% url 'ingredient_create' %}"><i class="fas fa-plus"></i>  Ajouter ingredient</a>
+<br/><br/>
+
+
+    <!--- MALTS --------------------------------------------------------------------------->
+    <h4>Malts</h4>
+
+      <table class="table table-responsive" id="Malt-table">
+        <thead class="thead-light">
+          <tr>
+            <th>Variété</th>
+            <th>Stock</th>
+            <th>dernier inventaire</th>
+            <th>EBC</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ingredient in malt %}
+          <tr data-toggle="collapse" data-target="#dataMalt{{ingredient.id}}" class="clickable">
+            <td>{{ ingredient.variete }}</td>
+            <td>{% if ingredient.stock < 1 %}{% widthratio ingredient.stock 1 1000 %} g{% else %}{{ ingredient.stock|floatformat }} kg{% endif %}</td>
+            <td><a href="{% url 'ingredient_update_stock' ingredient.id %}"><p style="font-size:x-small;color:#343A40;">{{ingredient.stock_last_update}}</p></a></td>
+            <td>{{ingredient.propriete}}</td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'ingredient_update' ingredient.id %}"><i class="fas fa-sync"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'ingredient_delete' ingredient.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          <tr>
+            <td colspan="6" style="border-top:none !important;padding:0rem;">
+                <div id="dataMalt{{ingredient.id}}" class="collapse" style="padding: 0.75rem;">
+                    {% if ingredient.description %}{{ingredient.description|linebreaksbr}}{% endif %}
+                </div>
+            </td>
+          </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center bg-warning">Pas encore d'ingredient.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    <!--- HOUBLONS --------------------------------------------------------------------------->
+    <h4>Houblons</h4>
+
+      <table class="table table-responsive" id="Houblon-table">
+        <thead class="thead-light">
+          <tr>
+            <th>Variété</th>
+            <th>Stock</th>
+            <th>dernier inventaire</th>
+            <th>Acide alpha</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ingredient in houblon %}
+          <tr data-toggle="collapse" data-target="#dataHoublon{{ingredient.id}}" class="clickable">
+            <td>{{ ingredient.variete }}</td>
+            <td>{% if ingredient.stock < 1 %}{% widthratio ingredient.stock 1 1000 %} g{% else %}{{ ingredient.stock|floatformat }} kg{% endif %}</td>
+            <td><a href="{% url 'ingredient_update_stock' ingredient.id %}"><p style="font-size:x-small;color:#343A40;">{{ingredient.stock_last_update}}</p></a></td>
+            <td>{{ingredient.propriete}}</td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'ingredient_update' ingredient.id %}"><i class="fas fa-edit"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'ingredient_delete' ingredient.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          <tr>
+            <td colspan="6" style="border-top:none !important;padding:0rem;">
+                <div id="dataHoublon{{ingredient.id}}" class="collapse" style="padding: 0.75rem;">
+                    {% if ingredient.description %}{{ingredient.description|linebreaksbr}}{% endif %}
+                </div>
+            </td>
+          </tr>
+
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center bg-warning">Pas encore d'ingredient.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    <!--- LEVURES --------------------------------------------------------------------------->
+    <h4>Levures</h4>
+
+      <table class="table table-responsive" id="Levure-table">
+        <thead class="thead-light">
+          <tr>
+            <th>Variété</th>
+            <th>Stock</th>
+            <th>dernier inventaire</th>
+            <th>Attenuation</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ingredient in levure %}
+          <tr>
+            <td>{{ ingredient.variete }}</td>
+            <td>{% if ingredient.stock < 1 %}{% widthratio ingredient.stock 1 1000 %} g{% else %}{{ ingredient.stock|floatformat }} kg{% endif %}</td>
+            <td><a href="{% url 'ingredient_update_stock' ingredient.id %}"><p style="font-size:x-small;color:#343A40;">{{ingredient.stock_last_update}}</p></a></td>
+            <td>{{ingredient.propriete}}</td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'ingredient_update' ingredient.id %}"><i class="fas fa-sync"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'ingredient_delete' ingredient.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center bg-warning">Pas encore d'ingredient.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    <!--- AUTRES --------------------------------------------------------------------------->
+    <h4>Autre</h4>
+
+      <table class="table table-responsive" id="Autre-table">
+        <thead class="thead-light">
+          <tr>
+            <th>Variété</th>
+            <th>Stock</th>
+            <th>dernier inventaire</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ingredient in autre %}
+          <tr>
+            <td>{{ ingredient.variete }}</td>
+            <td>{% if ingredient.stock < 1 %}{% widthratio ingredient.stock 1 1000 %} g{% else %}{{ ingredient.stock|floatformat }} kg{% endif %}</td>
+            <td><a href="{% url 'ingredient_update_stock' ingredient.id %}"><p style="font-size:x-small;color:#343A40;">{{ingredient.stock_last_update}}</p></a></td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'ingredient_update' ingredient.id %}"><i class="fas fa-sync"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'ingredient_delete' ingredient.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center bg-warning">Pas encore d'ingredient.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+{% endblock %}

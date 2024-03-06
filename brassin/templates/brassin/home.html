@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+<style>
+    .box{
+        position: relative;
+        display: inline-block; /* Make the width of box same as image */
+    }
+    .box .text{
+        position: absolute;
+        z-index: 999;
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        top: 10%; /* Adjust this value to move the positioned div up and down */
+        text-align: center;
+        width: 60%; /* Set the width of the positioned div */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="page-header">Brasserie</h1>
+        <div class="dropdown show float-right">
+          <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'note_create' %}">Note</a>
+            <a class="dropdown-item" href="{% url 'produit_create' %}">Produit</a>
+            <a class="dropdown-item" href="{% url 'fermenteur_create' %}">Fermenteur</a>
+          </div>
+        </div>
+    </div>
+  </div>
+
+    {% if messages %}
+        {% for message in messages %}
+                <div class="alert alert-dismissible {{ message.tags }}" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+        {% endfor %}
+    {% endif %}
+
+  {# NOTES #}
+
+  <div class="row">
+    <div class="col-12">
+        <div class="card-deck">
+          {% for note in notes %}
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">{{ note.titre }}  <a class="btn btn-outline-danger btn-sm float-right" href="{% url 'note_delete' note.id %}"><i class="fas fa-times"></i></a></h4>
+                <h6 class="card-subtitle mb-2 text-muted">{{ note.date }} - {{ note.auteur }}</h6>
+                <a data-toggle="tooltip" title="Editer" href="{% url 'note_update' note.id %}"><p class="card-text">{{ note.texte|linebreaksbr }}</p></a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+    </div>
+  </div>
+  </br>
+
+
+
+  <div class="row">
+    {# FERMENTEURS #}
+    <div class="col-8">
+      <div class="row justify-content-center">
+        {% for f in fermenteurs %}
+        <div class="col d-flex justify-content-center">
+            <div class="box" style="width: 150px;">
+              <img src="/media/fermenteur_{% if f.dispo %}vide{% else %}plein{% endif %}.png" alt="Fermenteur" style="  max-width:100%;max-height:100%;">
+
+              <div class="text">
+                  <div class="btn-group">
+                      <div class="btn-group">
+                          <button class="btn btn-dark btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ f.numero }}
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                            <a class="dropdown-item" href="{% url 'fermenteur_update' f.id %}">Editer</a>
+                            <a class="dropdown-item" href="{% url 'fermenteur_delete' f.id %}">Supprimer</a>
+                          </div>
+                      </div>
+                      <button type="button" class="btn btn-dark btn-sm">{{ f.volume }}L</button>
+                  </div>
+                  </br></br></br>
+                  {{ f.filled_with }}
+
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# STOCKS #}
+    <div class="col-4">
+        <h5>STOCK</h5>
+
+        {% regroup stock by brassin.recette.nom as recette_list %}
+
+        <table class="table table-responsive" id="Stock-brasserie-table">
+            <thead class="thead-light">
+                <tr>
+                    <th>Recette</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in recette_list %}
+                <tr>
+                    <td>{{ b.grouper }}</td>
+                    <td>
+                        {% for s in b.list %}
+                          <a data-toggle="tooltip" title="{{ s.brassin }}" href="{% url 'brassin_consult' s.brassin.id %}">{{ s.restant }} {{ s.produit.type_produit }}{% if s.restant > 1 %}s{% endif %} ({{ s.produit.contenance}} L) </a></br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+  </div>
+
+  </br>
+
+  {# PRODUITS #}
+  <div class="row">
+    <div class="col-12">
+      <h5>Produits</h5>
+      <table class="table table-hover table-responsive" id="Produits-table" style="width:100%">
+        <tbody>
+          {% for produit in produits %}
+          <tr>
+            <td>{{ produit.type_produit }}</td>
+            <td>{{ produit.contenance }}</td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'produit_update' produit.id %}"><i class="fas fa-edit"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'produit_delete' pk=produit.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          {% empty %}
+            <tr>
+              <td colspan="10" class="text-center bg-warning">Pas de produit.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+{% endblock %}

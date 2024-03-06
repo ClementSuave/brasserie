@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      	<h1>Brassin</h1>
+      	<h4>Brassin {{ brassin.numero }}
+			<a class="btn btn-outline-dark btn-sm" href="{% url 'brassin_update' brassin.id %}"><i class="fas fa-edit"></i></a>
+			<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'brassin_list' %}"><i class="fas fa-backspace"></i></a>
+		</h4>
+		<h5>{{ brassin.date_brassin }}</h5>
+    </div>
+</div>
+
+
+<div class="row ">
+	<div class="col-sm-12">
+	    <!--- NOTES --------------------------------------------------------------------------->
+		<div class="card h-100">
+		  <h5 class="card-header">NOTES</h5>
+
+		  <div class="card-body">
+            {{ brassin.notes|linebreaksbr }}
+		  </div>
+		</div>
+	</div>
+</div>
+
+<br/>
+
+<div class="row ">
+	<div class="col-sm-6">
+		<!--- PROFIL --------------------------------------------------------------------------->
+		<div class="card h-100">
+		  <h5 class="card-header">PROFIL</h5>
+
+		  <div class="card-body">
+		  	{% if brassin.recette %}<h5><a href="{% url 'recette_consult' brassin.recette.id %}">{{ brassin.recette }}</a></h5><br/>{% endif %}
+            <p>Calories/L: {{ brassin.calories|floatformat }}</p>
+
+			<div class="row ">
+			    <div id="IBU_gauge" class="col-sm-4"></div><div id="EBC_gauge" class="col-sm-4"></div><div id="Alcool_gauge" class="col-sm-4"></div>
+			</div>
+		  </div>
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="card h-100">
+		  <h5 class="card-header">STOCK</h5>
+
+		  <div class="card-body">
+			Date : {{ brassin.date_mise_bouteille }}<br/>
+			Resucrage: {{brassin.resucrage}} g/L <a href="{% url 'outils' brassin.id %}">(calc sucre)</a><br/>
+			Prix/L : {{ brassin.cout_brassin|floatformat:2}} €/L<br/><br/>
+
+			<table class="table table-hover">
+			    <thead>
+				    <tr><th>Quantité</th><th>Type</th><th>Vendus</th><th><a class="btn btn-outline-dark btn-sm" href="{% url 'brassin_produit_add' brassin.id %}"><i class="fas fa-plus"></i></a></th></tr>
+				</thead>
+				<tbody>
+					{% for p in brassin_produit.all %}
+					<tr>
+					    <td>{{ p.quantite|floatformat }}</td>
+					    <td>{{ p.produit }}</td>
+					    <td><a  href="{% url 'vente_create' bp=p.id %}">{{ p.vendu }}</a></td>
+    					<td><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_produit_delete' b=brassin.id pk=p.id %}"><i class="fas fa-times"></i></a></td>
+					</tr>
+					{% empty %}
+				    <tr>
+				        <td colspan="4" class="text-center bg-warning">Pas encore de produit.</td>
+				    </tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<br/>
+
+<div class="row ">
+
+	<!--- PRODUCTION --------------------------------------------------------------------------->
+	<div class="col-sm-6">
+		<div class="card h-100">
+		  <h5 class="card-header">BRASSAGE</h5>
+
+		  <div class="card-body">
+
+		    Profil chauffe:
+			<br/><br/>
+
+			<table class="table table-hover table-responsive">
+				<thead>
+				    <tr><th>Etape</th><th>Temperature</th><th>Durée</th><th><a class="btn btn-outline-dark btn-sm" href="{% url 'brassin_etape_chauffe_add' brassin.id %}"><i class="fas fa-plus"></i></a></th></tr>
+				</thead>
+				<tbody>
+				    {% for c in etape_chauffe %}
+					<tr>
+					    <td>{{ c.numero }}</td>
+					    <td>{{ c.temperature }} °C</a></td>
+					    <td>{{c.temps_etape}}</td>
+					    <td><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_etape_chauffe_delete' b=brassin.id pk=c.id %}"><i class="fas fa-times"></i></a></td>
+					</tr>
+					{% empty %}
+				    <tr><td colspan="4" class="text-center bg-warning">Pas d'étape de chauffe renseignée.</td></tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+            <br/>
+
+			<table class="table table-hover table-responsive">
+				<thead>
+				    <tr><th>Stade</th><th>Volume</th><th>Densité</th><th>Temps</th></tr>
+				</thead>
+				<tbody>
+					<tr><td>Empatage</td><td>{{ brassin.volume_empatage }}</td><td><a data-toggle="tooltip" title="{{ brassin.densite_avant_ebullitionP|floatformat }} °P">{{ brassin.densite_avant_ebullition }}</a></td><td>{{brassin.temps_empatage}}</td></tr>
+					<tr><td>Ebullition</td><td>{{ brassin.volume_mout }}</td><td><a data-toggle="tooltip" title="{{ brassin.densite_initialeP|floatformat }} °P">{{ brassin.densite_initiale }}</a></td><td>{{ brassin.temps_ebullition }}</td></tr>
+					<tr><td>Fermentation</td><td>{{ brassin.volume_cuve_fermentation }}</td><td><a data-toggle="tooltip" title="{{ brassin.densite_finaleP|floatformat }} °P">{{ brassin.densite_finale }}</a></td><td>{{ brassin.temps_fermentation }}</td></tr>
+				</tbody>
+			</table>
+
+			<br/>
+
+			Starter: {{brassin.volume_starter}} L<br/>
+			Rincage des dreches: {{brassin.volume_rincage_dreches}} L<br/>
+
+			<br/>
+
+			<div class="row ">
+                <div id="Attenuation_gauge" class="col-sm-4"></div><div id="Rendement_gauge" class="col-sm-4"></div><div class="col-sm-4"></div>
+            </div>
+
+		  </div>
+
+		</div>
+	</div>
+
+	<!--- INGREDIENTS --------------------------------------------------------------------------->
+	<div class="col-sm-6">
+		<div class="card h-100">
+		  <h5 class="card-header">INGREDIENTS {% if brassin.recette %}<a class="btn btn-dark btn-sm float-right" href="{% url 'brassin_ingredient_fill' brassin.id %}"><i class="fas fa-file-import"></i>  Recette</a>{% endif %}</h5>
+
+		  <div class="card-body">
+
+			<table class="table table-hover">
+				<thead>
+				    <tr>
+				        <th>Type</th>
+				        <th>Variété</th>
+				        <th>Quantité</th>
+				        <th><a class="btn btn-outline-dark btn-sm float-right" href="{% url 'brassin_ingredient_add' brassin.id %}"><i class="fas fa-plus"></i></a></th>
+				        <th><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_ingredient_delete_all' brassin.id %}"><i class="fas fa-times"></i></a></th>
+				    </tr>
+				</thead>
+				<tbody>
+					{% for ingredient in brassin_ingredient.all %}
+
+					<tr>
+					    <td><a data-toggle="tooltip" title="{{ ingredient.ingredient.propriete }}">{{ ingredient.ingredient.type_ingredient }}</a></td>
+    					<td><a data-toggle="tooltip" title="{{ ingredient.ingredient.propriete }}">{{ ingredient.ingredient.variete }}</a></td>
+    					<td> {% if ingredient.quantite < 1 %}{% widthratio ingredient.quantite 1 1000 %} g{% else %}{{ ingredient.quantite|floatformat }} kg{% endif %}</td>
+    					<td><a class="btn btn-outline-dark btn-sm" href="{% url 'brassin_ingredient_update' b=brassin.id pk=ingredient.id %}"><i class="fas fa-sync"></i></a></td>
+    					<td><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_ingredient_delete' b=brassin.id pk=ingredient.id %}"><i class="fas fa-times"></i></a></td>
+					</tr>
+					{% empty %}
+				    <tr>
+				        <td colspan="5" class="text-center bg-warning">Pas encore d'ingredient.</td>
+				    </tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		  </div>
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script>
+
+$('#IBU_gauge').highcharts(Highcharts.merge({
+    chart:{type: 'solidgauge',height: 150},
+    title: {text: "IBU",verticalAlign: 'middle',floating: true},
+    pane:{
+        center: ['50%', '50%'],
+        size: '100%',
+        startAngle: -90,
+        endAngle: 90,
+        background: {
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
+        }
+    },
+    tooltip: {enabled: false},
+    yAxis: {
+        stops: [
+            [0.1, '#55BF3B'], // green
+            [0.5, '#DDDF0D'], // yellow
+            [0.9, '#DF5353'] // red
+        ],
+        lineWidth: 0,
+        tickPositions: [],
+        labels: {y: 16}
+    },
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 0,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }},
+  {
+    yAxis: {min: 0,max: 120},
+    credits: {enabled: false},
+    series: [{
+        name: 'IBU',
+        data: [parseFloat({{brassin.IBU}})],
+        dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:14px;opacity:0.4">{{ brassin.IBU|floatformat}}</span></div>'
+        },
+        tooltip: {valueSuffix: ''}
+    }]
+}));
+
+$('#EBC_gauge').highcharts(Highcharts.merge({
+    chart:{type: 'solidgauge',height: 150},
+    title: {text: "EBC",verticalAlign: 'middle',floating: true},
+    pane:{
+        center: ['50%', '50%'],
+        size: '100%',
+        startAngle: -90,
+        endAngle: 90,
+        background: {
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
+        }
+    },
+    tooltip: {enabled: false},
+    yAxis: {
+        stops: [
+            [0.03, '#F6ED53'],
+            [0.04, '#F4EC32'],
+            [0.06, '#ECE730'],
+            [0.09, '#D5BC29'],
+            [0.11, '#BF913B'],
+            [0.14, '#BF803A'],
+            [0.19, '#BC6633'],
+            [0.24, '#8D4C32'],
+            [0.28, '#5C341A'],
+            [0.34, '#261715'],
+            [0.49, '#80707'],
+        ],
+        lineWidth: 0,
+        tickPositions: [],
+        labels: {y: 16}
+    },
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 0,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }},
+  {
+    yAxis: {min: 0,max: 140},
+    credits: {enabled: false},
+    series: [{
+        name: 'EBC',
+        data: [parseFloat({{brassin.EBC}})],
+        dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:14px;opacity:0.4">{{ brassin.EBC|floatformat}}</span></div>'
+        },
+        tooltip: {valueSuffix: ''}
+    }]
+}));
+
+$('#Alcool_gauge').highcharts(Highcharts.merge({
+    chart:{type: 'solidgauge',height: 150},
+    title: {text: "Alcool",verticalAlign: 'middle',floating: true},
+    pane:{
+        center: ['50%', '50%'],
+        size: '100%',
+        startAngle: -90,
+        endAngle: 90,
+        background: {
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
+        }
+    },
+    tooltip: {enabled: false},
+    yAxis: {
+        stops: [
+            [0.25, '#E80000'],
+            [0.5, '#A80000'],
+            [0.75, '#780000 '],
+            [0.9, '#300000 '],
+        ],
+        lineWidth: 0,
+        tickPositions: [],
+        labels: {y: 16}
+    },
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 0,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }},
+  {
+    yAxis: {min: 0,max: 13},
+    credits: {enabled: false},
+    series: [{
+        name: 'Alcool',
+        data: [parseFloat({{brassin.taux_alcool}})],
+        dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:14px;opacity:0.4">{{ brassin.taux_alcool|floatformat}} %</span></div>'
+        },
+        tooltip: {valueSuffix: ''}
+    }]
+}));
+
+$('#Attenuation_gauge').highcharts(Highcharts.merge({
+    chart:{type: 'solidgauge',height: 150},
+    title: {text: "Attenuation",verticalAlign: 'middle',floating: true},
+    pane:{
+        center: ['50%', '50%'],
+        size: '100%',
+        startAngle: 0,
+        endAngle: 360,
+        background: {
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+            innerRadius: '75%',
+            outerRadius: '90%',
+            shape: 'arc'
+        }
+    },
+    tooltip: {enabled: false},
+    yAxis: {
+        lineWidth: 0,
+        tickPositions: [],
+    },
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 0,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }},
+  {
+    yAxis: {min: 0,max: 100},
+    credits: {enabled: false},
+    series: [{
+        name: 'Attenuation',
+        data: [{
+            color: '#FDC131',
+            radius: '75%',
+            innerRadius: '90%',
+            y: parseFloat({{brassin.attenuation}})
+        }],
+        dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:14px;opacity:0.4">{{ brassin.attenuation|floatformat:"0" }} %</span></div>'
+        },
+        tooltip: {valueSuffix: ''}
+    }]
+}));
+
+$('#Rendement_gauge').highcharts(Highcharts.merge({
+    chart:{type: 'solidgauge',height: 150},
+    title: {text: "Rendement",verticalAlign: 'middle',floating: true},
+    pane:{
+        center: ['50%', '50%'],
+        size: '100%',
+        startAngle: 0,
+        endAngle: 360,
+        background: {
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+            innerRadius: '75%',
+            outerRadius: '90%',
+            shape: 'arc'
+        }
+    },
+    tooltip: {enabled: false},
+    yAxis: {
+        lineWidth: 0,
+        tickPositions: [],
+    },
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 0,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }},
+  {
+    yAxis: {min: 0,max: 100},
+    credits: {enabled: false},
+    series: [{
+        name: 'Rendement',
+        data: [{
+            color: '#FDC131',
+            radius: '75%',
+            innerRadius: '90%',
+            y: parseFloat({{brassin.rendement}})
+        }],
+        dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:14px;opacity:0.4">{{ brassin.rendement|floatformat:"0" }} %</span></div>'
+        },
+        tooltip: {valueSuffix: ''}
+    }]
+}));
+
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="page-header">Brassins</h1>
+    </div>
+  </div>
+
+    {% if messages %}
+        {% for message in messages %}
+                <div class="alert alert-dismissible {{ message.tags }}" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+        {% endfor %}
+    {% endif %}
+
+      <a class="btn btn-info btn-sm" href="{% url 'brassin_create' %}"><i class="fas fa-plus"></i>  Brassin</a>
+
+  <br/><br/>
+  {# BRASSINS #}
+
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-hover" id="Brassin-table" style="width:100%">
+        <thead class="thead-light">
+          <tr>
+            <th>#</th>
+            <th>Brassage</th>
+            <th>Recette</th>
+            <th>Alcool</th>
+            <th>Densité i</th>
+            <th>Densité f</th>
+            <th>Embouteillage</th>
+            <th>Archivé</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for brassin in brassins %}
+          <tr>
+            {# <td>{{ forloop.revcounter }} </td>#}
+            <td><a data-toggle="tooltip" title="{{ brassin.notes }}" class="btn btn-outline-dark btn-sm" href="{% url 'brassin_consult' brassin.id %}">{{ brassin.numero }}</a></td>
+            <td>{{ brassin.date_brassin }}</td>
+            <td><a href="{% if brassin.recette %}{% url 'recette_consult' brassin.recette.id %}{% endif %}">{{ brassin.recette }}</a></td>
+            <td>{{ brassin.taux_alcool|floatformat }} %</td>
+            <td>{{ brassin.densite_initiale }}</td>
+            <td>{{ brassin.densite_finale }}</td>
+            <td>{{ brassin.date_mise_bouteille }}</td>
+            <td style="text-align: center;vertical-align: middle;">{% if brassin.archive %}<i class="far fa-check-circle" style="color:#28a745"></i>{% endif %}</td>
+            <td><a class="btn btn-outline-dark btn-sm" href="{% url 'brassin_update' brassin.id %}"><i class="fas fa-sync"></i></a></td>
+            <td><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_delete' brassin.id %}"><i class="fas fa-times"></i></a></td>
+          </tr>
+          {% empty %}
+            <tr>
+              <td colspan="10" class="text-center bg-warning">Pas encore de brassin.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+   </div>
+  </div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.20/sorting/datetime-moment.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.25/dataRender/datetime.js"></script>
+  <script>
+
+  $('#Brassin-table').DataTable({
+        "info" : false,
+        "order": [[ 1, "desc" ]],
+        "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"},
+        "columnDefs": [
+            { "orderable": false, "targets": [3, 4, 5, 7, 8] },
+            { "targets": [1], render: $.fn.dataTable.render.moment('DD/MM/YYYY','DD/MM/YYYY')}
+        ]
+  });
+  </script>
+{% endblock %}

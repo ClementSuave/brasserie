@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Recette</h1>
+    <h4>{{ recette.nom }} - supprimer<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'recettes_list' %}"><i class="fas fa-backspace"></i></a></h4>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+
+  	<h4><i class="fa fa-exclamation-triangle"></i> Êtes-vous sûr de vouloir supprimer la recette {{ recette.nom }} ?</h4>
+  	<br/>
+
+	<form method="post" action="">
+	   {% csrf_token %} 
+	   <input type="submit" value="Oui" class="btn btn-warning"/> <a class="btn btn-secondary" href="{% url 'recettes_list' %}">Non</a>
+	</form>
+
+</div>
+
+{% endblock %}

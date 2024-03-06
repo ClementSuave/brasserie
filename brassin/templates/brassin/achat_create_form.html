@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{{ form.media }}
+{% load crispy_forms_tags %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Achats</h1>
+    <h4>Ajouter<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'achats_list' %}"><i class="fas fa-backspace"></i></a></h4>
+  </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible {{ message.tags }}" role="alert">
+    {{ message }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="card h-100">
+
+  <div class="card-body">
+
+    <form action="" method="post">
+      {% csrf_token %}
+
+      {{ form.type_achat|as_crispy_field }}
+      {{ form.date_achat|as_crispy_field }}
+      {{ form.ingredient|as_crispy_field }}
+      {{ form.quantite|as_crispy_field }}
+
+      <button type="submit" class="btn btn-info">Ajouter</button>
+
+    </form>
+
+    <br/>
+
+    <table class="table table-hover table-responsive">
+		<thead>
+		    <tr><th>Date</th><th>Ingrédient</th><th>Quantité</th</tr>
+		</thead>
+		<tbody>
+			{% for a in last_three.all %}
+			<tr>
+			    <td>{{ a.date_achat }}</td>
+			    <td>{{ a.ingredient }}</td>
+			    <td>{{ a.quantite|floatformat }}</td>
+			</tr>
+			{% empty %}
+		    <tr>
+		        <td colspan="3" class="text-center bg-warning">Pas encore d'achat.</td>
+		    </tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<a class="btn btn-success float-right" href="{% url 'achats_list' %}">OK</i></a>
+
+    <br/>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+{% endblock %}

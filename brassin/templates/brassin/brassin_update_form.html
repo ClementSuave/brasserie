@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{{ form.media }}
+{% load crispy_forms_tags %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Brassin</h1>
+    <h4>Brassin {{ brassin.id }} - editer<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'brassin_consult' brassin.id %}"><i class="fas fa-backspace"></i></a></h4>
+    <h5>{{ brassin.date_brassin }}</h5>
+  </div>
+</div>
+
+<div class="card h-100">
+
+  <div class="card-body">
+
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.numero|as_crispy_field }}
+      {{ form.date_brassin|as_crispy_field }}
+      {{ form.recette|as_crispy_field }}
+      {{ form.fermenteur|as_crispy_field }}
+
+      <br/>
+      <h4>Brassage</h4>
+      <div class="row"><div class="col-12">
+
+        <div class="row">
+          <div class="col-3">
+            <label for id_densite_avant_ebullition_P class="col-form-label">Densité (°P) </label>
+            <input type="text" class="form-control" name="id_densite_avant_ebullition_P" id="id_densite_avant_ebullition_P" onkeyup="calc_SG(this.value, this.name)" placeholder="°P" />
+          </div>
+          <div class="col-3">{{ form.densite_avant_ebullition|as_crispy_field }}</div>
+          <div class="col-3">{{ form.volume_empatage|as_crispy_field }}</div>
+          <div class="col-3">{{ form.temps_empatage|as_crispy_field }}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">
+            <label for id_densite_initiale_P class="col-form-label">Densité (°P) </label>
+            <input type="text" class="form-control" name="id_densite_initiale_P" id="id_densite_initiale_P" onkeyup="calc_SG(this.value, this.name)" placeholder="°P" />
+          </div>
+          <div class="col-3">{{ form.densite_initiale|as_crispy_field }}</div>
+          <div class="col-3">{{ form.volume_mout|as_crispy_field }}</div>
+          <div class="col-3">{{ form.temps_ebullition|as_crispy_field }}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-3">
+            <label for id_densite_finale_P class="col-form-label">Densité (°P) </label>
+            <input type="text" class="form-control" name="id_densite_finale_P" id="id_densite_finale_P" onkeyup="calc_SG(this.value, this.name)" placeholder="°P" />
+          </div>
+          <div class="col-3">{{ form.densite_finale|as_crispy_field }}</div>
+          <div class="col-3">{{ form.volume_cuve_fermentation|as_crispy_field }}</div>
+          <div class="col-3">{{ form.temps_fermentation|as_crispy_field }}</div>
+        </div>
+
+        {{ form.volume_rincage_dreches|as_crispy_field }}
+        {{ form.volume_starter|as_crispy_field }}
+        {{ form.resucrage|as_crispy_field }}
+
+      </div></div>
+
+      <br/>
+      <h4>Mise en bouteille</h4>
+      <div class="row">
+
+        <div class="col-6">
+          {{ form.date_mise_bouteille|as_crispy_field }}
+        </div>
+
+      </div>
+
+        {{ form.archive|as_crispy_field }}
+
+        {{ form.notes|as_crispy_field }}
+
+        <button type="submit" class="btn btn-info">Editer</button>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+{% endblock %}

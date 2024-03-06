@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{{ form.media }}
+{% load crispy_forms_tags %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Mise à jour du stock</h1>
+    <h4>{{ i.variete }}</h4>
+    <h5>Stock actuel: {% if i.stock < 0 %}{% widthratio i.stock 1 1000 %} g{% else %}{{ i.stock|floatformat }} kg{% endif %}</h5>
+  </div>
+</div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible {{ message.tags }}" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+<div class="card h-100">
+
+  <div class="card-body">
+
+    <form action="" method="post">
+      {% csrf_token %}
+
+      {{ form.type_achat|as_crispy_field }}
+      {{ form.date_achat|as_crispy_field }}
+      {{ form.ingredient|as_crispy_field }}
+
+
+      <label for id_stock_mesured class="col-form-label">Masse mesurée (kg) </label>
+      <input type="text" class="form-control" name="id_stock_mesured" id="id_stock_mesured" onkeyup="calc_Stock_actual(this.value,{{i.stock}})" placeholder="kg" required>
+
+      {{ form.quantite|as_crispy_field }}
+
+      </br>
+
+      <button type="submit" class="btn btn-info">Mettre à jour</button>
+
+      <a class="btn btn-success float-right" href="{% url 'ingredients_list' %}">OK</i></a>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+  <script>
+  //UPDATE Stock mise à jour
+    function calc_Stock_actual(str,stock)
+    {
+      var id_input_to_update = 'id_quantite';
+      if (str.length > 0 && !isNaN(str))
+      {
+        var diff = str-stock;
+        diff = diff.toFixed(2);
+        $('#' + id_input_to_update).val(diff);
+        return;
+      }
+    }
+
+  </script>
+{% endblock %}

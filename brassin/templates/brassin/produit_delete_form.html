@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Produits</h1>
+    <h4>{{ produit.type_produit }} {{ produit.contenance }}- supprimer<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'home' %}"><i class="fas fa-backspace"></i></a></h4>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+
+  	<h4><i class="fa fa-exclamation-triangle"></i> Êtes-vous sûr de vouloir supprimer le produit:</h4>
+  	<h4>{{ produit.type_produit }}</h4>
+  	<p>{{ produit.contenance }}</p>
+  	<br/>
+
+	<form method="post" action="">
+	   {% csrf_token %}
+	   <input type="submit" value="Oui" class="btn btn-warning"/> <a class="btn btn-secondary" href="{% url 'home' %}">Non</a>
+	</form>
+
+</div>
+
+{% endblock %}

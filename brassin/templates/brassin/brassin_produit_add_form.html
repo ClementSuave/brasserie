@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+{{ form.media }}
+{% load crispy_forms_tags %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="page-header">Brassin</h1>
+    <h4>Brassin {{ b.numero }} - Ajouter produit<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'brassin_consult' form.brassin.value %}"><i class="fas fa-backspace"></i></a>
+    </h4>
+    <h5>{{b.date_brassin}}</h5>
+  </div>
+</div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible {{ message.tags }}" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+<div class="card h-100">
+
+    <div class="card-body">
+
+        <form action="" method="POST">
+            {% csrf_token %}
+
+            {{ form.brassin|as_crispy_field }}
+
+             <div class="form-row align-items-center">
+                <div class="col-4">
+                    {{ form.produit|as_crispy_field }}
+                </div>
+                <div class="col-4">
+                    {{ form.quantite|as_crispy_field }}
+                </div>
+                <div class="col-4 justify-content-center">
+                    </br>
+                    <button type="submit" class="btn btn-info">Ajouter</button>
+                </div>
+             </div>
+
+        </form>
+
+        <table class="table table-hover table-responsive">
+		    <thead>
+			    <tr><th>Quantité</th><th>Type</th><th></th></tr>
+			</thead>
+			<tbody>
+				{% for p in brassin_produit.all %}
+				<tr>
+				    <td>{{ p.quantite|floatformat }}</td>
+				    <td>{{ p.produit }}</td>
+    				<td><a class="btn btn-outline-danger btn-sm" href="{% url 'brassin_produit_delete' b=b.id pk=p.id %}"><i class="fas fa-times"></i></a></td>
+				</tr>
+				{% empty %}
+			    <tr>
+			        <td colspan="3" class="text-center bg-warning">Pas encore de produit.</td>
+			    </tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+        <a class="btn btn-success float-right" href="{% url 'brassin_consult' form.brassin.value %}">OK</i></a>
+
+        <br/>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
+{% endblock %}

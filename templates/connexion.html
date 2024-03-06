@@ -1,0 +1,50 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brasserie Lesquillerie</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <!-- <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"> -->
+    {% block css %}
+    {% endblock %}
+  </head>
+  <body>
+  	<div class="container">
+		{% load crispy_forms_tags %}
+		<div class="jumbotron jumbotron-fluid">
+		  <div class="container">
+		    <h1 class="page-header">Brasserie</h1>
+		    <h3>Connexion</h3>
+		  </div>
+		</div>
+
+		{% if error %}
+		<div class="alert alert-danger" role="alert">Utilisateur ou mot de passe incorrect.</div>
+		{% endif %}
+        <div class="row">
+            <div class="mx-auto w-50">
+    		<form method="post" action=".">
+    		    {% csrf_token %}
+
+    		    {{ form.username|as_crispy_field }}
+    		    {{ form.password|as_crispy_field }}
+
+    		    <button type="submit" class="btn btn-info">Connexion</button>
+    		</form>
+    		</div>
+
+		</div>
+
+	</div>
+  </body>
+
