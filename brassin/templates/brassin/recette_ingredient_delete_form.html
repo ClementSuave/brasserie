@@ -5,7 +5,7 @@
 <div class="jumbotron jumbotron-fluid">
   <div class="container">
     <h1 class="page-header">Recette</h1>
-    <h4>Recette {{ recetteingredient.recette_id }}<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'recette_consult' recetteingredient.recette.id %}"><i class="fas fa-backspace"></i></a>
+    <h4>Recette {{ recetteingredient.recette.nom }}<a class="btn btn-outline-warning btn-sm float-right" href="{% url 'recette_consult' recetteingredient.recette.id %}"><i class="fas fa-backspace"></i></a>
     </h4>
     <h5>Supprimer ingredient</h5>
   </div>

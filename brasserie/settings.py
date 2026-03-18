@@ -11,23 +11,26 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Charge les variables du fichier .env
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'q_4ax!5xthr0(s39krmc&(b%5=8y7fd+kp&_^909gicj7q+03='
+# En production, stocker dans une variable d'environnement :
+# export DJANGO_SECRET_KEY='votre-clé-secrète'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'q_4ax!5xthr0(s39krmc&(b%5=8y7fd+kp&_^909gicj7q+03=')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ["clem24.pythonanywhere.com"]
-SESSION_COOKIE_AGE = 10800
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
+
+csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS')
+if csrf_origins:
+    CSRF_TRUSTED_ORIGINS = csrf_origins.split(',')
 
 # Application definition
 
@@ -89,8 +92,6 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -108,10 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
-
-LOGIN_URL = '/brasserie/connexion'
-
 LANGUAGE_CODE = 'fr'
 
 TIME_ZONE = 'Europe/Paris'
@@ -122,17 +119,40 @@ USE_L10N = False
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
+# Formats de date/heure
 TIME_FORMAT = 'H:i'
 DATE_FORMAT = 'd/m/Y'
 DATE_INPUT_FORMATS = [
     '%d-%m-%Y', '%d/%m/%Y', '%d/%m/%y',
 ]
+
+# Fichiers media (uploads)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+# Fichiers statiques
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+# Email (désactiver le backend console en production)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Authentification
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/home/'
+LOGOUT_REDIRECT_URL = '/connexion/'
+
+# Session : 8h, expiration à la fermeture du navigateur
+SESSION_COOKIE_AGE = 28800
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_HTTPONLY = True  # Inaccessible au JavaScript (protection XSS)
+
+# Sécurité production (HTTPS uniquement sur PythonAnywhere)
+SECURE_SSL_REDIRECT = True                  # Redirige HTTP → HTTPS
+SECURE_HSTS_SECONDS = 31536000             # Force HTTPS pendant 1 an
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True      # Inclut les sous-domaines
+SECURE_HSTS_PRELOAD = True                 # Autorise le preloading HSTS
+SESSION_COOKIE_SECURE = True               # Cookie session uniquement en HTTPS
+CSRF_COOKIE_SECURE = True                  # Cookie CSRF uniquement en HTTPS
+X_FRAME_OPTIONS = 'DENY'                   # Interdit l'intégration en iframe
+SECURE_CONTENT_TYPE_NOSNIFF = True         # Empêche le sniffing de type MIME

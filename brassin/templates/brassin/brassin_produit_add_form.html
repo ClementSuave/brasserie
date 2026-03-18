@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
-{% endblock %}
 
 {% block content %}
 {{ form.media }}
@@ -80,6 +77,3 @@
 
 {% endblock %}
 
-{% block javascript %}
-  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
-{% endblock %}

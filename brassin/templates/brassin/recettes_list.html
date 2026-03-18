@@ -2,9 +2,6 @@
 
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
-{% endblock %}
 
 {% block content %}
 
@@ -48,45 +45,3 @@
 
 {% endblock %}
 
-{% block javascript %}
-  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
-  <script>
-  //CALCULS RECETTE
-  $("#volume_empatage_desire").on("keyup", function() {
-    var v_empatage = $(this).val();
-    var table=$("#table_ing_recette");
-    var rowLength = $("#table_ing_recette tr").length;
-    var taux_empatage =$("#taux_empatage").val();
-    var masse_tot = taux_empatage*v_empatage
-    var quantite_tot_malt =0
-    //pour chaque ligne du tableau ingredients
-    for (var i=1; i<rowLength; i+=1)
-    {
-      //calculer les quantités
-      var stock =parseFloat($('table tr:nth-child('+i+') td:nth-child(7)').text())
-      var ing =$('table tr:nth-child('+i+') td:nth-child(1)').text()
-      if (ing=="Malt"){
-        var percent = $('table tr:nth-child('+i+') td:nth-child(3)').text();
-        var quantite = masse_tot*parseFloat(percent)/100 ;
-        $('table tr:nth-child('+i+') td:nth-child(5)').text(quantite.toFixed(2) + " kg");
-      }
-      else if (ing=="Levure"){
-        $('table tr:nth-child('+i+') td:nth-child(5)').text("");
-      }
-      else {
-        var c = $('table tr:nth-child('+i+') td:nth-child(3)').text();
-        var quantite = v_empatage*c/1000 ;
-        if (quantite > 1){$('table tr:nth-child('+i+') td:nth-child(5)').text(quantite.toFixed(2) + " kg");}
-        else {quantite_g=quantite*1000;$('table tr:nth-child('+i+') td:nth-child(5)').text(quantite_g.toFixed(2) + " g");}
-      }
-
-      //alert stock
-      if (quantite>stock){$('table tr:nth-child('+i+') td:nth-child(5)').css({'color':'red'});}
-      else {$('table tr:nth-child('+i+') td:nth-child(5)').css({'color':'black'});}
-
-    }
-    $("#volume_rincage_dreches").val(10+masse_tot)
-  });
-
-  </script>
-{% endblock %}

@@ -100,7 +100,7 @@ class IngredientForm(forms.ModelForm):
 	prix_kg = forms.DecimalField(required=False, max_digits=6, min_value=0,widget= forms.TextInput(attrs={'placeholder':'€/kg'}))
 	ebc_min = forms.DecimalField(required=False, max_digits=4, min_value=0)
 	ebc_max = forms.DecimalField(required=False, max_digits=4, min_value=0)
-	acide_alpha = forms.DecimalField(required=False, max_digits=2, min_value=0,widget= forms.TextInput(attrs={'placeholder':'%'}))
+	acide_alpha = forms.DecimalField(required=False, max_digits=3, min_value=0,widget= forms.TextInput(attrs={'placeholder':'%'}))
 	attenuation_min = forms.DecimalField(required=False, max_digits=2, min_value=0,widget= forms.TextInput(attrs={'placeholder':'%'}))
 	attenuation_max = forms.DecimalField(required=False, max_digits=3, min_value=0,widget= forms.TextInput(attrs={'placeholder':'%'}))
 
@@ -118,18 +118,19 @@ class AchatForm(forms.ModelForm):
 class VenteForm(forms.ModelForm):
     brassin_produit = forms.ModelChoiceField(queryset=BrassinProduit.objects.exclude(brassin__date_mise_bouteille__isnull=True))
     prix = forms.DecimalField(required=False,widget= forms.TextInput(attrs={'placeholder':'€'}))
+
     def clean_quantite(self):
         data = self.cleaned_data['quantite']
-        bp_id =self['brassin_produit'].value()
-        total = BrassinProduit.objects.get(pk=bp_id).quantite
-        ventes_sum = Vente.objects.filter(brassin_produit=bp_id).aggregate(Sum('quantite')).get('quantite__sum',0.00)
-
-        if ventes_sum is None:
-            ventes_sum=0.00
+        bp_id = self['brassin_produit'].value()
+        try:
+            bp = BrassinProduit.objects.get(pk=bp_id)
+        except BrassinProduit.DoesNotExist:
+            raise ValidationError('Produit invalide.')
+        total = bp.quantite
+        ventes_sum = Vente.objects.filter(brassin_produit=bp_id).aggregate(Sum('quantite')).get('quantite__sum') or 0
         dispo = Decimal(total) - Decimal(ventes_sum)
-
         if data > dispo:
-            raise ValidationError('Pas assez de produit disponible, reste '+ str(dispo))
+            raise ValidationError('Pas assez de produit disponible, reste ' + str(dispo))
         return data
 
     class Meta:
@@ -150,5 +151,3 @@ class StockUpdateForm(forms.ModelForm):
             'ingredient': forms.HiddenInput(),
             'quantite': forms.HiddenInput(),
             'date_achat': DatePickerInput(format='%d/%m/%Y'),}
-
-

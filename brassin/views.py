@@ -82,32 +82,32 @@ def Home(request):
 #-------------------------------------------------------------------------------------------------------------
 
 class NoteCreate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Note
-	template_name = 'brassin/note_create_form.html'
-	form_class = NoteForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'note.add_choice'
-	success_message = 'Note ajoutée.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Note
+    template_name = 'brassin/note_create_form.html'
+    form_class = NoteForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'note.add_choice'
+    success_message = 'Note ajoutée.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
-	def form_valid(self, form):
-		n = form.save(commit=False)
-		n.auteur = self.request.user.username
-		n.date = datetime.now()
-		n.save()
-		return super().form_valid(form)
+    def form_valid(self, form):
+        n = form.save(commit=False)
+        n.auteur = self.request.user.username
+        n.date = datetime.now()
+        n.save()
+        return super().form_valid(form)
 
 class NoteUpdate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Note
-	id = Note.id
-	template_name = 'brassin/note_update_form.html'
-	form_class = NoteForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'note.change_choice'
-	success_message = 'Note mise à jour.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Note
+    id = Note.id
+    template_name = 'brassin/note_update_form.html'
+    form_class = NoteForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'note.change_choice'
+    success_message = 'Note mise à jour.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
 class NoteDelete(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Note
@@ -123,27 +123,29 @@ class NoteDelete(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,
 #-------------------------------------------------------------------------------------------------------------
 
 class ProduitCreate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Produit
-	template_name = 'brassin/produit_create_form.html'
-	form_class = ProduitForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'produit.add_choice'
-	success_message = 'Produit ajouté.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Produit
+    template_name = 'brassin/produit_create_form.html'
+    form_class = ProduitForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'produit.add_choice'
+    success_message = 'Produit ajouté.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
 class ProduitUpdate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Produit
-	id = Produit.id
-	template_name = 'brassin/produit_update_form.html'
-	form_class = ProduitForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'produit.change_choice'
-	success_message = 'Produit mis à jour.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Produit
+    id = Produit.id
+    template_name = 'brassin/produit_update_form.html'
+    form_class = ProduitForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'produit.change_choice'
+    success_message = 'Produit mis à jour.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
 
+@login_required
+@permission_required('produit.delete_choice', raise_exception=True)
 def ProduitDelete(request, pk):
 
     p = get_object_or_404(Produit, pk=pk)
@@ -164,25 +166,25 @@ def ProduitDelete(request, pk):
 #-------------------------------------------------------------------------------------------------------------
 
 class FermenteurCreate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Fermenteur
-	template_name = 'brassin/fermenteur_create_form.html'
-	form_class = FermenteurForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'fermenteur.add_choice'
-	success_message = 'Fermenteur ajouté.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Fermenteur
+    template_name = 'brassin/fermenteur_create_form.html'
+    form_class = FermenteurForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'fermenteur.add_choice'
+    success_message = 'Fermenteur ajouté.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
 class FermenteurUpdate(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Fermenteur
-	id = Fermenteur.id
-	template_name = 'brassin/fermenteur_update_form.html'
-	form_class = FermenteurForm
-	success_url =  reverse_lazy('home')
-	permission_required = 'fermenteur.change_choice'
-	success_message = 'Fermenteur mis à jour.'
-	def get_success_message(self, cleaned_data):
-	    return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
+    model = Fermenteur
+    id = Fermenteur.id
+    template_name = 'brassin/fermenteur_update_form.html'
+    form_class = FermenteurForm
+    success_url =  reverse_lazy('home')
+    permission_required = 'fermenteur.change_choice'
+    success_message = 'Fermenteur mis à jour.'
+    def get_success_message(self, cleaned_data):
+        return messages.success(self.request,self.success_message, extra_tags = 'alert-success')
 
 class FermenteurDelete(SuccessMessageMixin,PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Fermenteur
@@ -204,19 +206,19 @@ def BrassinsList(request):
     return render(request, "brassin/brassin_list.html", {'brassins': bs})
 
 class BrassinCreate(PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Brassin
-	template_name = 'brassin/brassin_create_form.html'
-	form_class = BrassinForm
-	permission_required = 'brassin.add_choice'
-	success_url =  reverse_lazy('brassin_list')
+    model = Brassin
+    template_name = 'brassin/brassin_create_form.html'
+    form_class = BrassinForm
+    permission_required = 'brassin.add_choice'
+    success_url =  reverse_lazy('brassin_list')
 
 class BrassinUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Brassin
-	id = Brassin.id
-	template_name = 'brassin/brassin_update_form.html'
-	form_class = BrassinForm
-	permission_required = 'brassin.change_choice'
-	success_url = "/brasserie/brassins/{id}/"
+    model = Brassin
+    id = Brassin.id
+    template_name = 'brassin/brassin_update_form.html'
+    form_class = BrassinForm
+    permission_required = 'brassin.change_choice'
+    success_url = "/brasserie/brassins/{id}/"
 
 class BrassinDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Brassin
@@ -224,17 +226,18 @@ class BrassinDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     permission_required = 'brassin.delete_choice'
     success_url = reverse_lazy('brassin_list')
 
+@login_required
 def BrassinConsult(request, id):
-	b = get_object_or_404(Brassin, id=id)
-	bi = BrassinIngredient.objects.all().filter(brassin=b).order_by('ingredient__type_ingredient')
-	p = BrassinProduit.objects.all().filter(brassin=b)
-	c = BrassinEtapeChauffe.objects.all().filter(brassin=b).order_by('numero')
+    b = get_object_or_404(Brassin, id=id)
+    bi = BrassinIngredient.objects.all().filter(brassin=b).order_by('ingredient__type_ingredient')
+    p = BrassinProduit.objects.all().filter(brassin=b)
+    c = BrassinEtapeChauffe.objects.all().filter(brassin=b).order_by('numero')
 
-	try:
-		r = Recette.objects.get(id=b.recette_id)
-	except Recette.DoesNotExist:
-		r = None
-	return render(request, 'brassin/brassin_consulter.html', {'brassin': b,'brassin_ingredient':bi,'recette':r,'brassin_produit':p,'etape_chauffe':c})
+    try:
+        r = Recette.objects.get(id=b.recette_id)
+    except Recette.DoesNotExist:
+        r = None
+    return render(request, 'brassin/brassin_consulter.html', {'brassin': b,'brassin_ingredient':bi,'recette':r,'brassin_produit':p,'etape_chauffe':c})
 
 #-------------------------------------------------------------------------------------------------------------
 # BRASSIN ETAPE
@@ -384,24 +387,24 @@ class BrassinProduitDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView
 #-------------------------------------------------------------------------------------------------------------
 
 class RecettesList(LoginRequiredMixin,ListView):
-	model = Recette
-	context_object_name = "recettes"
-	template_name = "brassin/recettes_list.html"
+    model = Recette
+    context_object_name = "recettes"
+    template_name = "brassin/recettes_list.html"
 
 class RecetteCreate(PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Recette
-	template_name = 'brassin/recette_create_form.html'
-	form_class = RecetteForm
-	permission_required = 'recette.add_choice'
-	success_url =  reverse_lazy('recettes_list')
+    model = Recette
+    template_name = 'brassin/recette_create_form.html'
+    form_class = RecetteForm
+    permission_required = 'recette.add_choice'
+    success_url =  reverse_lazy('recettes_list')
 
 class RecetteUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Recette
-	id = Recette.id
-	template_name = 'brassin/recette_update_form.html'
-	form_class = RecetteForm
-	permission_required = 'recette.change_choice'
-	success_url = "/brasserie/recettes/{id}/"
+    model = Recette
+    id = Recette.id
+    template_name = 'brassin/recette_update_form.html'
+    form_class = RecetteForm
+    permission_required = 'recette.change_choice'
+    success_url = "/brasserie/recettes/{id}/"
 
 class RecetteDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Recette
@@ -411,10 +414,10 @@ class RecetteDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
 
 @login_required
 def RecetteConsult(request, id):
-	r = get_object_or_404(Recette, id=id)
-	ri = RecetteIngredient.objects.all().filter(recette=r)
-	dataset_chart_recette = Brassin.objects.all().filter(recette=r).exclude(densite_initiale__isnull=True).exclude(densite_finale__isnull=True).values('id','date_brassin', 'densite_initiale','densite_finale').order_by('date_brassin')
-	return render(request, 'brassin/recette_consulter.html', {'recette': r,'recette_ingredient':ri,'dataset_chart_recette':dataset_chart_recette})
+    r = get_object_or_404(Recette, id=id)
+    ri = RecetteIngredient.objects.all().filter(recette=r)
+    dataset_chart_recette = Brassin.objects.all().filter(recette=r).exclude(densite_initiale__isnull=True).exclude(densite_finale__isnull=True).values('id','date_brassin', 'densite_initiale','densite_finale').order_by('date_brassin')
+    return render(request, 'brassin/recette_consulter.html', {'recette': r,'recette_ingredient':ri,'dataset_chart_recette':dataset_chart_recette})
 
 #-------------------------------------------------------------------------------------------------------------
 # RECETTE INGREDIENT
@@ -423,24 +426,24 @@ def RecetteConsult(request, id):
 @permission_required('recette_ingredient.add_choice', raise_exception=True)
 def RecetteIngredientAdd(request,id):
 
-	if request.method == 'POST':
-		form = RecetteIngredientForm(request.POST)
-		form.fields["recette"].initial = id
+    if request.method == 'POST':
+        form = RecetteIngredientForm(request.POST)
+        form.fields["recette"].initial = id
 
-		if form.is_valid():
-			data = form.cleaned_data
-			if "Levure" in str(data["ingredient"]):
-			    message = str(data["ingredient"]) + " ajouté."
-			elif "Malt" in str(data["ingredient"]):
-			    message = str(data["quantite"])+ " % masse totale de " + str(data["ingredient"]) + " ajouté."
-			else:
-			    message = str(data["quantite"]) + " g/l de " + str(data["ingredient"]) + " ont étés ajoutés."
-			form.save()
-			messages.success(request, message)
-	else:
-		form = RecetteIngredientForm()
-		form.fields["recette"].initial = id
-	return render(request, 'brassin/recette_ingredient_add_form.html', {'form': form})
+        if form.is_valid():
+            data = form.cleaned_data
+            if "Levure" in str(data["ingredient"]):
+                message = str(data["ingredient"]) + " ajouté."
+            elif "Malt" in str(data["ingredient"]):
+                message = str(data["quantite"])+ " % masse totale de " + str(data["ingredient"]) + " ajouté."
+            else:
+                message = str(data["quantite"]) + " g/l de " + str(data["ingredient"]) + " ont étés ajoutés."
+            form.save()
+            messages.success(request, message)
+    else:
+        form = RecetteIngredientForm()
+        form.fields["recette"].initial = id
+    return render(request, 'brassin/recette_ingredient_add_form.html', {'form': form})
 
 class RecetteIngredientUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
     model = RecetteIngredient
@@ -490,60 +493,60 @@ def StockUpdate(request,id):
     return render(request, 'brassin/stock_update_form.html', {'form': form,'i':i})
 
 class IngredientsList(LoginRequiredMixin,ListView):
-	model = Ingredient
-	template_name = "brassin/ingredients_list.html"
+    model = Ingredient
+    template_name = "brassin/ingredients_list.html"
 
-	def get_context_data(self, **kwargs):
-	    context = super(IngredientsList, self).get_context_data(**kwargs)
-	    context['malt'] = Ingredient.objects.filter(type_ingredient="Malt")
-	    context['houblon'] = Ingredient.objects.filter(type_ingredient="Houblon")
-	    context['levure'] = Ingredient.objects.filter(type_ingredient="Levure")
-	    context['autre'] = Ingredient.objects.filter(type_ingredient="Autre")
-	    return context
+    def get_context_data(self, **kwargs):
+        context = super(IngredientsList, self).get_context_data(**kwargs)
+        context['malt'] = Ingredient.objects.filter(type_ingredient="Malt")
+        context['houblon'] = Ingredient.objects.filter(type_ingredient="Houblon")
+        context['levure'] = Ingredient.objects.filter(type_ingredient="Levure")
+        context['autre'] = Ingredient.objects.filter(type_ingredient="Autre")
+        return context
 
 class IngredientCreate(PermissionRequiredMixin,LoginRequiredMixin,CreateView):
-	model = Ingredient
-	template_name = 'brassin/ingredient_create_form.html'
-	form_class = IngredientForm
-	permission_required = 'ingredient.add_choice'
-	success_url =  reverse_lazy('ingredients_list')
+    model = Ingredient
+    template_name = 'brassin/ingredient_create_form.html'
+    form_class = IngredientForm
+    permission_required = 'ingredient.add_choice'
+    success_url =  reverse_lazy('ingredients_list')
 
 class IngredientUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Ingredient
-	template_name = 'brassin/ingredient_update_form.html'
-	form_class = IngredientForm
-	permission_required = 'ingredient.change_choice'
-	success_url =  reverse_lazy('ingredients_list')
+    model = Ingredient
+    template_name = 'brassin/ingredient_update_form.html'
+    form_class = IngredientForm
+    permission_required = 'ingredient.change_choice'
+    success_url =  reverse_lazy('ingredients_list')
 
 
 class IngredientDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
-	model = Ingredient
-	template_name = 'brassin/ingredient_delete_form.html'
-	form_class = IngredientForm
-	permission_required = 'ingredient.delete_choice'
-	success_url =  reverse_lazy('ingredients_list')
+    model = Ingredient
+    template_name = 'brassin/ingredient_delete_form.html'
+    form_class = IngredientForm
+    permission_required = 'ingredient.delete_choice'
+    success_url =  reverse_lazy('ingredients_list')
 
 #-------------------------------------------------------------------------------------------------------------
 # ACHATS
 #-------------------------------------------------------------------------------------------------------------
 
 class AchatsList(LoginRequiredMixin,ListView):
-	model = Achat
-	context_object_name = "achats"
-	template_name = "brassin/achats_list.html"
-	ordering = ['-date_achat']
+    model = Achat
+    context_object_name = "achats"
+    template_name = "brassin/achats_list.html"
+    ordering = ['-date_achat']
 
-	def get_context_data(self, **kwargs):
-	    context = super(AchatsList, self).get_context_data(**kwargs)
-	    achats = Achat.objects.all()
-	    context['achat'] = achats
-	    context['fonctionnement'] = Achat.objects.filter(type_achat="Fonctionnement").order_by('-date_achat')
-	    prix_achat = 0
-	    for a in achats:
-	        if a.ingredient.prix_kg:
-	            prix_achat += a.ingredient.prix_kg*a.quantite
-	    context['total_achats'] = prix_achat
-	    return context
+    def get_context_data(self, **kwargs):
+        context = super(AchatsList, self).get_context_data(**kwargs)
+        achats = Achat.objects.all()
+        context['achat'] = achats
+        context['fonctionnement'] = Achat.objects.filter(type_achat="Fonctionnement").order_by('-date_achat')
+        prix_achat = 0
+        for a in achats:
+            if a.ingredient.prix_kg:
+                prix_achat += a.ingredient.prix_kg*a.quantite
+        context['total_achats'] = prix_achat
+        return context
 
 @login_required
 @permission_required('achat.add_choice', raise_exception=True)
@@ -564,11 +567,11 @@ def AchatCreate(request):
 
 
 class AchatUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Achat
-	template_name = 'brassin/achat_update_form.html'
-	form_class = AchatForm
-	permission_required = 'achat.change_choice'
-	success_url = reverse_lazy('achats_list')
+    model = Achat
+    template_name = 'brassin/achat_update_form.html'
+    form_class = AchatForm
+    permission_required = 'achat.change_choice'
+    success_url = reverse_lazy('achats_list')
 
 class AchatDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Achat
@@ -616,11 +619,11 @@ def VenteCreate(request, bp=None, r=None):
     return render(request, 'brassin/vente_create_form.html', {'form': form,'last_three':l})
 
 class VenteUpdate(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
-	model = Vente
-	template_name = 'brassin/vente_update_form.html'
-	form_class = VenteForm
-	permission_required = 'vente.change_choice'
-	success_url = reverse_lazy('ventes_list')
+    model = Vente
+    template_name = 'brassin/vente_update_form.html'
+    form_class = VenteForm
+    permission_required = 'vente.change_choice'
+    success_url = reverse_lazy('ventes_list')
 
 class VenteDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
     model = Vente
@@ -645,4 +648,3 @@ def Outils(request,id=0):
     except Recette.DoesNotExist:
         r = Recette.objects.get(id=1)
     return render(request, "brassin/outils.html", {'brassin_x': b,'recette':r,'fermenteur':f})
-

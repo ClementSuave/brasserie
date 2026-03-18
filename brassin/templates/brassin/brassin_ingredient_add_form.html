@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
-{% endblock %}
 
 {% block content %}
 {{ form.media }}
@@ -90,7 +87,6 @@
 {% endblock %}
 
 {% block javascript %}
-  <script type="text/javascript" src="{% static 'brassin/js/brassin.js' %}"></script>
   <script>
     //INGREDIENT ADD FORM (BRASSIN / RECETTE)
     $("#id_ingredient").on('change', function() {

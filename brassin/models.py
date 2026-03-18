@@ -71,13 +71,9 @@ class Ingredient(models.Model):
 
 	@property
 	def stock(self):
-		achat_sum = Achat.objects.filter(ingredient=self.id).aggregate(Sum('quantite')).get('quantite__sum',0.00) if Achat else 0.00
-		brassin_sum = BrassinIngredient.objects.filter(ingredient=self.id).aggregate(Sum('quantite')).get('quantite__sum',0.00) if BrassinIngredient else 0.00
-		if not achat_sum:
-			return brassin_sum
-		if not brassin_sum:
-			return achat_sum
-		return achat_sum - brassin_sum
+		achat_sum = Achat.objects.filter(ingredient=self.id).aggregate(Sum('quantite')).get('quantite__sum') or 0
+		brassin_sum = BrassinIngredient.objects.filter(ingredient=self.id).aggregate(Sum('quantite')).get('quantite__sum') or 0
+		return max(0, achat_sum - brassin_sum)
 
 	@property
 	def stock_last_update(self):
@@ -99,7 +95,7 @@ class Ingredient(models.Model):
 	    if not self.ebc_min and not self.ebc_max:
 	        return 0
 	    elif not self.ebc_min or not self.ebc_max:
-	        return
+	        return 0
 	    else:
 	        return (self.ebc_min + self.ebc_max)/2
 
@@ -112,7 +108,7 @@ class Ingredient(models.Model):
 	@property
 	def propriete(self):
 		if self.type_ingredient=="Malt":
-			return str((self.ebc_min+self.ebc_max)/2)
+			return str(self.ebc)
 		if self.type_ingredient=="Houblon":
 			return str(self.acide_alpha) + " %"
 		if self.type_ingredient=="Levure":
@@ -196,13 +192,11 @@ class Brassin(models.Model):
 			return
 		return ((Decimal(258.6)*(self.densite_initiale-1))/(Decimal(0.88)*self.densite_initiale+Decimal(0.12)));
 
-
 	@property
 	def densite_finaleP(self):
 		if not self.densite_finale:
 			return
 		return ((Decimal(258.6)*(self.densite_finale-1))/(Decimal(0.88)*self.densite_finale+Decimal(0.12)));
-
 
 	@property
 	def densite_avant_ebullitionP(self):
@@ -216,14 +210,16 @@ class Brassin(models.Model):
 
 	@property
 	def cout_brassin(self):
-		ings_achetes=BrassinIngredient.objects.filter(brassin=self.id).filter(achete=True)
-		cout_brassin=0
+		# FIX: vérification que prix_kg n'est pas None avant de multiplier
+		ings_achetes = BrassinIngredient.objects.filter(brassin=self.id).filter(achete=True)
+		cout_brassin = 0
 		if ings_achetes.exists():
 			for ing in ings_achetes:
-			    cout_brassin += ing.ingredient.prix_kg*ing.quantite
+				if ing.ingredient.prix_kg:
+					cout_brassin += ing.ingredient.prix_kg * ing.quantite
 		if not self.volume_cuve_fermentation:
 			return
-		return cout_brassin/self.volume_cuve_fermentation
+		return cout_brassin / self.volume_cuve_fermentation
 
 	@property
 	def attenuation(self):
@@ -271,11 +267,12 @@ class Brassin(models.Model):
 
 	@property
 	def EBC(self):
+		# FIX: indentation corrigée
 		Malts_brassin = BrassinIngredient.objects.filter(brassin=self.id).filter(ingredient__type_ingredient="Malt")
-		MCU =0
+		MCU = 0
 		if Malts_brassin.exists() and self.volume_mout and self.volume_mout != 0:
-			    for malt in Malts_brassin:
-				    MCU += Decimal(4.23)*malt.quantite*malt.ingredient.ebc/self.volume_mout
+			for malt in Malts_brassin:
+				MCU += Decimal(4.23)*malt.quantite*malt.ingredient.ebc/self.volume_mout
 		return Decimal(2.939)*MCU**Decimal(0.6859)
 
 class BrassinEtapeChauffe(models.Model):
@@ -340,7 +337,7 @@ class Achat(models.Model):
             return 0
         else:
             ing = self.ingredient
-            if ing.prix_kg:
+            if ing and ing.prix_kg:
                 return ing.prix_kg*self.quantite
             else:
                 return 0
@@ -351,7 +348,8 @@ class Achat(models.Model):
         achats = Achat.objects.all()
         for a in achats:
             ing = a.ingredient
-            total += ing.prix_kg*a.quantite
+            if ing and ing.prix_kg:
+                total += ing.prix_kg * a.quantite
         return total
 
 class Vente(models.Model):

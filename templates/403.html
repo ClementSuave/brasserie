@@ -1,19 +1,29 @@
-{% extends 'base.html' %}
-
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'brassin/css/style.css' %}" />
-{% endblock %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Accès refusé</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container mt-5">
 
-{% block content %}
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <h1 class="page-header">Erreur 403</h1>
+        </div>
+      </div>
 
-<div class="jumbotron jumbotron-fluid">
-  <div class="container">
-    <h1 class="page-header">Erreur</h1>
-  </div>
-</div>
+      <div class="alert alert-warning">
+        <h4><i class="fa fa-exclamation-triangle"></i> Accès refusé.</h4>
+        <p>Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+        <a href="/" class="btn btn-dark btn-sm">Retour à l'accueil</a>
+      </div>
 
-<h4><i class="fa fa-exclamation-triangle"></i> Accès refusé.</h4>
-
-{% endblock %}
+    </div>
+  </body>
+</html>
