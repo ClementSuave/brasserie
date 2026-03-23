@@ -12,12 +12,11 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
-
-load_dotenv()  # Charge les variables du fichier .env
-
+from pathlib import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(Path(BASE_DIR) / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # En production, stocker dans une variable d'environnement :
