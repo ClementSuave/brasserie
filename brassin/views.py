@@ -9,8 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.forms import PasswordChangeForm
 from django.db.models import Sum, Count, Max, ProtectedError, F
 from django.db.models.functions import TruncMonth
-from datetime import datetime
 from django.contrib.messages.views import SuccessMessageMixin
+from datetime import datetime, timedelta
 
 from .models import Profile, Fermenteur, Produit, Ingredient, Recette, Note, Brassin, BrassinEtapeChauffe, BrassinProduit, BrassinIngredient, RecetteIngredient, Achat, Vente
 from .forms import ConnexionForm, FermenteurForm, ProduitForm, IngredientForm, RecetteForm, NoteForm, BrassinForm, BrassinEtapeChauffeForm, BrassinProduitForm, BrassinIngredientForm, RecetteIngredientForm, AchatForm, VenteForm, StockUpdateForm
@@ -584,20 +584,19 @@ class AchatDelete(PermissionRequiredMixin,LoginRequiredMixin,DeleteView):
 #-------------------------------------------------------------------------------------------------------------
 
 @login_required
-def VentesList(request, date_s=datetime.now().replace(year = datetime.now().year - 1),date_e=datetime.now()):
-
-    if request.method == 'POST':
+def VentesList(request):
+    if request.method == 'POST' and request.POST.get('date_s') and request.POST.get('date_e'):
         date_s = request.POST['date_s']
         date_e = request.POST['date_e']
+        v = Vente.objects.filter(date_vente__range=[date_s, date_e])
+        vm = Vente.objects.filter(date_vente__range=[date_s, date_e]).annotate(month=TruncMonth('date_vente')).values('month').annotate(tot_by_month=Sum('prix')).order_by()
+        t = Vente.objects.filter(date_vente__range=[date_s, date_e]).aggregate(sum_all=Sum('prix')).get('sum_all')
     else:
-        date_s=datetime.now().replace(year = datetime.now().year - 1)
-        date_e=datetime.now()
+        v = Vente.objects.all()
+        vm = Vente.objects.all().annotate(month=TruncMonth('date_vente')).values('month').annotate(tot_by_month=Sum('prix')).order_by()
+        t = Vente.objects.all().aggregate(sum_all=Sum('prix')).get('sum_all')
 
-    v = Vente.objects.filter(date_vente__range = [date_s,date_e])
-    vm = Vente.objects.filter(date_vente__range = [date_s,date_e]).annotate(month=TruncMonth('date_vente')).values('month').annotate(tot_by_month=Sum('prix')).order_by()
-    t = Vente.objects.all().filter(date_vente__range = [date_s,date_e]).aggregate(sum_all=Sum('prix')).get('sum_all')
-
-    return render(request, "brassin/ventes_list.html", {'ventes': v, 'ventes_by_month':vm, 'total_recettes':t,'date_s':date_s})
+    return render(request, "brassin/ventes_list.html", {'ventes': v, 'ventes_by_month': vm, 'total_recettes': t})
 
 @login_required
 @permission_required('vente.add_choice', raise_exception=True)

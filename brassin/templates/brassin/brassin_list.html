@@ -71,18 +71,19 @@
 {% endblock %}
 
 {% block javascript %}
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.20/sorting/datetime-moment.js"></script>
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.25/dataRender/datetime.js"></script>
   <script>
-
-  $('#Brassin-table').DataTable({
-        "info" : false,
-        "order": [[ 1, "desc" ]],
-        "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"},
-        "columnDefs": [
-            { "orderable": false, "targets": [3, 4, 5, 7, 8] },
-            { "targets": [1], render: $.fn.dataTable.render.moment('DD/MM/YYYY','DD/MM/YYYY')}
-        ]
+  $(document).ready(function() {
+    if ($('#Brassin-table').length) {
+      $('#Brassin-table').DataTable({
+            "info" : false,
+            "order": [[ 1, "desc" ]],
+            "language": {"url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"},
+            "columnDefs": [
+                { "orderable": false, "targets": [7, 8, 9] },
+                { "targets": [0], "type": "date" }  // juste le tri, sans reformatage
+            ]
+      });
+    }
   });
   </script>
 {% endblock %}

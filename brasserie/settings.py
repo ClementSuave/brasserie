@@ -148,11 +148,11 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_HTTPONLY = True  # Inaccessible au JavaScript (protection XSS)
 
 # Sécurité production (HTTPS uniquement sur PythonAnywhere)
-SECURE_SSL_REDIRECT = True                  # Redirige HTTP → HTTPS
+SECURE_SSL_REDIRECT = False                  # Redirige HTTP → HTTPS
 SECURE_HSTS_SECONDS = 31536000             # Force HTTPS pendant 1 an
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True      # Inclut les sous-domaines
-SECURE_HSTS_PRELOAD = True                 # Autorise le preloading HSTS
-SESSION_COOKIE_SECURE = True               # Cookie session uniquement en HTTPS
+SECURE_HSTS_PRELOAD = False                 # Autorise le preloading HSTS
+SESSION_COOKIE_SECURE = False               # Cookie session uniquement en HTTPS
 CSRF_COOKIE_SECURE = True                  # Cookie CSRF uniquement en HTTPS
 X_FRAME_OPTIONS = 'DENY'                   # Interdit l'intégration en iframe
 SECURE_CONTENT_TYPE_NOSNIFF = True         # Empêche le sniffing de type MIME

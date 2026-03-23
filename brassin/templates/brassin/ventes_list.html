@@ -69,48 +69,48 @@
 
 {% block javascript %}
 
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.20/sorting/datetime-moment.js"></script>
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.25/dataRender/datetime.js"></script>
 
   <script>
-  $('#Vente-table').DataTable({
+  $(document).ready(function() {
+
+if ($('#Vente-table').length) {
+    $('#Vente-table').DataTable({
         "info" : false,
         "order": [[ 0, "desc" ]],
-        "language": {"url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"},
+        "language": {"url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"},
         "columnDefs": [
             { "orderable": false, "targets": [7, 8, 9] },
-            { "targets": [0], render: $.fn.dataTable.render.moment('DD/MM/YYYY','DD/MM/YYYY')}
+            { "targets": [0], "type": "date" }  // juste le tri, sans reformatage
         ]
+    });
+}
+
+    if (typeof Highcharts !== 'undefined' && $('#chart_ventes_month').length) {
+      Highcharts.chart('chart_ventes_month', {
+          chart: {type: 'column'},
+          title:{text:''},
+          legend:{enabled:false},
+          xAxis: {categories: [{% for entry in ventes_by_month %}'{{ entry.month|date:"b - Y" }}'{% if not forloop.last %}, {% endif %}{% endfor %}]},
+          yAxis: {
+              min: 0,
+              title: {text: 'Ventes (€)'}
+          },
+          tooltip: {
+              headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+              pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:.1f} €</b></td></tr>',
+              footerFormat: '</table>',
+              shared: true,
+              useHTML: true
+          },
+          series: [{
+              name: 'Ventes',
+              data: [{% for entry in ventes_by_month %}{{ entry.tot_by_month }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+              color: 'green'
+          }]
+      });
+    }
+
   });
-
-            Highcharts.chart('chart_ventes_month', {
-                chart: {type: 'column'},
-                title:{text:''},
-                legend:{enabled:false},
-                xAxis: {categories: [{% for entry in ventes_by_month %}'{{ entry.month|date:"b - Y" }}'{% if not forloop.last %}, {% endif %}{% endfor %}]},
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Ventes (€)'
-                    }
-                },
-                tooltip: {
-                        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                            '<td style="padding:0"><b>{point.y:.1f} €</b></td></tr>',
-                        footerFormat: '</table>',
-                        shared: true,
-                        useHTML: true
-                    },
-
-                series: [
-                    {
-                        name: 'Ventes',
-                        data: [{% for entry in ventes_by_month %}{{ entry.tot_by_month }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                        color: 'green'
-                    },
-                ]
-            });
   </script>
 
 {% endblock %}

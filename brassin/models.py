@@ -171,7 +171,7 @@ class Brassin(models.Model):
 	notes = models.TextField(blank=True,null=True)
 	resucrage = models.DecimalField(blank=True,null=True, max_digits=2, decimal_places=1)
 
-	ingredient = models.ManyToManyField(Ingredient, through='BrassinIngredient',null=True,blank=True)
+	ingredient = models.ManyToManyField(Ingredient, through='BrassinIngredient',blank=True)
 	recette = models.ForeignKey(Recette, on_delete=models.SET_NULL, null=True,blank=True)
 	fermenteur = models.ForeignKey(Fermenteur, on_delete=models.SET_NULL, null=True,blank=True)
 
